@@ -1,7 +1,7 @@
 module LEAP
 
 # Write your package code here
-using DataFrames, Query, CSV, JLD2, FileIO
+using DataFrames, Query, CSV, JLD, JLD2, FileIO
 using Setfield, Distributions, StatsFuns, StatsBase, Random, SpecialFunctions
 using TimerOutputs, Printf
 
