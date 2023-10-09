@@ -60,7 +60,6 @@ function set_up(max_age=111,province="BC",starting_year=2000,time_horizon=19,n=1
         
         @set! incidence.hyperparameters[:β0_μ] = 0;
         @set! incidence.hyperparameters[:β0_σ] = 0.00000001;
-        @set! incidence.initial_distribution = asthma_initial_distribution;
         @set! incidence.incidence_table = groupby(filter([:year,:province] => (x,y) -> x >= min(starting_year,master_incidence_rate.year[nrow(master_incidence_rate)]) && y==province,master_incidence_rate),:year);
         @set! incidence.prevalence_table = groupby(filter([:year,:province] => (x,y) -> x >= min(starting_year-1,master_prevalence_rate.year[nrow(master_prevalence_rate)]) && y==province,master_prevalence_rate),:year);
         @set! incidence.parameters[:β0] = 0;

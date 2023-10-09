@@ -1,7 +1,7 @@
 # import all the necessary files
 include("global_variables.jl")
 include("utils.jl")
-include.(filter(contains(r".jl$"), readdir(joinpath(dirname(pathof(Asthma_Julia)),"modules/"); join=true)))
+include.(filter(contains(r".jl$"), readdir(joinpath(dirname(pathof(LEAP)),"modules/"); join=true)))
 
 mutable struct Simulation <: Simulation_Module
     max_age::Int
