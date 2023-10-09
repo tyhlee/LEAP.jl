@@ -2,8 +2,6 @@ function Dict_initializer(parameter_names::Union{Nothing,Vector{Symbol}})
     isnothing(parameter_names) ? nothing : Dict(parameter_names .=> missing)
 end
 
-AbstractTrees.children(x::Type) = subtypes(x)
-
 function choose_bp(bp::DataFrame,projection_scenario::String,min_year::Int64)
     filter!(row -> ((row.Projection_scenario == projection_scenario) & (row.calendar_year>=min_year)),bp)
 end

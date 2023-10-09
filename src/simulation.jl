@@ -98,9 +98,7 @@ function process(simulation::Simulation,seed=missing,until_all_die=false,verbose
 
     # loop by year
     for cal_year in cal_years
-        if verbose
-            println(cal_year)
-        end
+        println(cal_year)
 
         # time stamp
         @timeit to "calendar year $cal_year" begin
