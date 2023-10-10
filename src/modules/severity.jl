@@ -84,7 +84,7 @@ function process_initial(exac_severity::Exacerbation_Severity,asthma_age::Int64,
         # toss a coin: avg chance of having at least one hosp
         # https://stats.stackexchange.com/questions/174952/marginal-probability-function-of-the-dirichlet-multinomial-distribution
         zero_prob = 1/SpecialFunctions.gamma(total_rate+1) * SpecialFunctions.gamma(total_rate+1-exac_severity.parameters[:p][4])/SpecialFunctions.gamma(1-exac_severity.parameters[:p][4])
-        return Int(rand(Bernoulli(1-max(min(zero_prob,0),1))))
+        return Int(rand(Bernoulli(1-min(max(zero_prob,0),1))))
     end
 end
 
