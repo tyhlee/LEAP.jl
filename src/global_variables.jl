@@ -1,9 +1,3 @@
-birth_projection = CSV.read(joinpath(dirname(pathof(LEAP)), "processed_data","birth_projection.csv"),DataFrame)
-# change to more intuitive column names
-rename!(birth_projection,Dict(:REF_DATE => "calendar_year", :VALUE => "n"))
-# correct the data type for n
-birth_projection[!,:n] = convert.(Int64,round.(birth_projection.n,digits=0))
-
 master_birth_estimate = CSV.read(joinpath(dirname(pathof(LEAP)), "processed_data","master_birth_estimate.csv"),DataFrame)
 master_population_initial_distribution = CSV.read(joinpath(dirname(pathof(LEAP)), "processed_data","master_initial_pop_distribution_prop.csv"),DataFrame)
 

@@ -2,10 +2,6 @@ function Dict_initializer(parameter_names::Union{Nothing,Vector{Symbol}})
     isnothing(parameter_names) ? nothing : Dict(parameter_names .=> missing)
 end
 
-function choose_bp(bp::DataFrame,projection_scenario::String,min_year::Int64)
-    filter!(row -> ((row.Projection_scenario == projection_scenario) & (row.calendar_year>=min_year)),bp)
-end
-
 function vec_to_dict(v::AbstractArray, ll::AbstractVector)::AbstractDict
     d = Dict()
         for i in eachindex(ll)
@@ -19,12 +15,10 @@ function set_up(max_age=111,province="BC",starting_year=2000,time_horizon=19,n=1
         
         agent = Agent(false,0,starting_year,1,true,0,false,0,0,nothing,[0,0],[zeros(4),zeros(4)],0,false,false)
 
-        birth = Birth(nothing,nothing,nothing)
+        birth = Birth(nothing,nothing)
         @set! birth.estimate = filter([:year, :province, :projection_scenario] => (x, y, z) -> x >= starting_year && y == province && (z == population_growth_type || z == "past"), master_birth_estimate)
         relative(x) = x/birth.estimate.N[1]
         @set! birth.estimate = transform(birth.estimate,:N => relative)
-
-        @set! birth.trajectory = choose_bp(birth_projection,population_growth_type,starting_year)
         @set! birth.initial_population =  filter([:year, :province, :projection_scenario] => (x, y, z) -> x == starting_year && y == province && (z == population_growth_type || z == "past"), master_population_initial_distribution)
 
         death = Death(Dict_initializer([:β0,:β1,:β2]),nothing)

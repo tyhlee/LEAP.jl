@@ -1,6 +1,5 @@
 struct Birth <: Birth_Module
     estimate
-    trajectory
     initial_population
 end
 

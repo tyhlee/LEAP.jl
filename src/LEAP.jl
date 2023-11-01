@@ -16,7 +16,6 @@ export
     random_parameter_initialization!,
     set_up,
     # global datasets
-    birth_projection,
     master_birth_estimate,
     master_life_table,
     master_population_initial_distribution,
