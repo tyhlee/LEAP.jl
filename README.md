@@ -1,6 +1,6 @@
 # Lifetime Exposures and Asthma outcomes Projection (LEAP)
 
-Documentation for LEAP will be available by the end of 2023.
+Documentation for LEAP will be available in January 2024.
 
 Here is the pseudo-code of the model:
 
