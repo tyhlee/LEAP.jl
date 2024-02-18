@@ -5,7 +5,6 @@ using DataFrames, Query, CSV, JLD, JLD2, FileIO
 using Setfield, Distributions, StatsFuns, StatsBase, Random, SpecialFunctions
 using TimerOutputs, Printf
 
-# using Plots
 
 include("simulation.jl")
 
@@ -21,10 +20,8 @@ export
     master_population_initial_distribution,
     master_immigration_table,
     master_emigration_table,
+    master_occurrence_correction,
     master_reassessment,
-    master_dx,
-    master_mis_dx,
-    M3_calibrated_asthma_prev_inc
     exacerbation_calibration
     eq5d
 end # module

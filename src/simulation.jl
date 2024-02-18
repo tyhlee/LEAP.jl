@@ -17,7 +17,6 @@ mutable struct Simulation <: Simulation_Module
     death::Death_Module
     incidence::Incidence_Module
     reassessment::Reassessment_Module
-    diagnosis::Diagnosis_Module
     control::Control_Module
     exacerbation::Exacerbation_Module
     exacerbation_severity::Exacerbation_Severity_Module
@@ -218,10 +217,24 @@ function process(simulation::Simulation,seed=missing,until_all_die=false,verbose
                 # no asthma
                 if !simulation.agent.has_asthma
                     # asthma inc
-                    @set! simulation.agent.has_asthma = process(simulation.agent,simulation.incidence,simulation.antibioticExposure.AbxOR)
+                    @set! simulation.agent.has_asthma = process(simulation.agent,simulation.incidence)
                     
-                    # crude incidence record
+                    # simulate and record asthma related events if they are labeled with asthma
                     if simulation.agent.has_asthma
+                        @set! simulation.agent.asthma_age = copy(simulation.agent.age)
+                        event_dict["asthma_incidence"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1 
+                        @set! simulation.agent.control = process(simulation.agent,simulation.control)
+                        event_dict["control"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1,:] += simulation.agent.control
+                        @set! simulation.agent.exac_hist[1] = process(simulation.agent,simulation.exacerbation)
+                        
+                        if simulation.agent.exac_hist[1] != 0
+                            @set! simulation.agent.exac_sev_hist[1] = process(simulation.exacerbation_severity,simulation.agent.exac_hist[1],(simulation.agent.total_hosp>0),simulation.agent.age)
+                            @set! simulation.agent.total_hosp += simulation.agent.exac_sev_hist[1][4]
+                            event_dict["exacerbation"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += simulation.agent.exac_hist[1]
+                            event_dict["exacerbation_hospital"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += simulation.agent.exac_sev_hist[1][4]
+                            event_dict["exacerbation_by_severity"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1,:] .+= simulation.agent.exac_sev_hist[1]
+                        end
+
                         event_dict["asthma_incidence_contingency_table"][(simulation.agent.cal_year,Int(simulation.agent.sex),Int(simulation.agent.family_hist),min(simulation.agent.num_antibiotic_use,3))][simulation.agent.age+1,"n_asthma"] += 1
                     else
                         event_dict["asthma_incidence_contingency_table"][(simulation.agent.cal_year,Int(simulation.agent.sex),Int(simulation.agent.family_hist),min(simulation.agent.num_antibiotic_use,3))][simulation.agent.age+1,"n_no_asthma"] += 1
@@ -236,47 +249,13 @@ function process(simulation::Simulation,seed=missing,until_all_die=false,verbose
                         # event_dict["asthma_status_family_history"][simulation.agent.family_hist+1,simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
                         # event_dict["asthma_status_antibiotic_exposure"][min(simulation.agent.num_antibiotic_use+1,4),simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
                     end
-
-                    # asthma Dx
-                    @set! simulation.agent.has_asthma = process(simulation.agent,simulation.diagnosis)
-
-                    # dx with asthma
-                    if simulation.agent.has_asthma
-                        # if they did not have asthma dx in the past, then record it
-                        @set! simulation.agent.asthma_age = copy(simulation.agent.age)
-                        event_dict["asthma_incidence"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1 
-                        # event_dict["asthma_incidence_family_history"][simulation.agent.family_hist+1,simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-                        # event_dict["asthma_incidence_antibiotic_exposure"][min(simulation.agent.num_antibiotic_use+1,4),simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-    
-                        # event_dict["asthma_prevalence"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1 
-                        # # event_dict["asthma_prevalence_family_history"][simulation.agent.family_hist+1,simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-                        # # event_dict["asthma_prevalence_antibiotic_exposure"][min(simulation.agent.num_antibiotic_use+1,4),simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-                        # event_dict["asthma_prevalence_contingency_table"][(simulation.agent.cal_year,Int(simulation.agent.sex),Int(simulation.agent.family_hist),min(simulation.agent.num_antibiotic_use,3))][simulation.agent.age+1,"n_asthma"] += 1
-                        
-                        @set! simulation.agent.control = process(simulation.agent,simulation.control)
-                        event_dict["control"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1,:] += simulation.agent.control
-
-                        @set! simulation.agent.exac_hist[1] = process(simulation.agent,simulation.exacerbation)
-                        
-                        if simulation.agent.exac_hist[1] != 0
-                            @set! simulation.agent.exac_sev_hist[1] = process(simulation.exacerbation_severity,simulation.agent.exac_hist[1],(simulation.agent.total_hosp>0),simulation.agent.age)
-                            @set! simulation.agent.total_hosp += simulation.agent.exac_sev_hist[1][4]
-                            event_dict["exacerbation"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += simulation.agent.exac_hist[1]
-                            event_dict["exacerbation_hospital"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += simulation.agent.exac_sev_hist[1][4]
-                            event_dict["exacerbation_by_severity"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1,:] .+= simulation.agent.exac_sev_hist[1]
-                        end
-                    end
                 # has asthma
                 else
                     # reassessment
                     @set! simulation.agent.has_asthma = process(simulation.agent,simulation.reassessment) 
-                    # if still dxed with asthma
+                    # if still labeled with asthma
                     if simulation.agent.has_asthma
-                        # event_dict["asthma_prevalence"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1 
-                        # # event_dict["asthma_prevalence_family_history"][simulation.agent.family_hist+1,simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-                        # # event_dict["asthma_prevalence_antibiotic_exposure"][min(simulation.agent.num_antibiotic_use+1,4),simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1] += 1
-                        # event_dict["asthma_prevalence_contingency_table"][(simulation.agent.cal_year,Int(simulation.agent.sex),Int(simulation.agent.family_hist),min(simulation.agent.num_antibiotic_use,3))][simulation.agent.age+1,"n_asthma"] += 1
-                        
+
                         #  update control
                         @set! simulation.agent.control = process(simulation.agent,simulation.control)
                         event_dict["control"][simulation.agent.cal_year_index,simulation.agent.age+1,simulation.agent.sex+1,:] += simulation.agent.control
