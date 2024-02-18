@@ -10,7 +10,15 @@ function vec_to_dict(v::AbstractArray, ll::AbstractVector)::AbstractDict
     return d
 end
 
-function set_up(max_age=111,province="BC",starting_year=2000,time_horizon=19,n=100,population_growth_type="LG")
+function logit(p)
+    log.( p ./ (1 .- p) )
+end
+
+function inverse_logit(x)
+    exp.(x) ./ (1 .+ exp.(x))
+end
+
+function set_up(max_age=111,province="BC",starting_year=2001,time_horizon=19,n=100,population_growth_type="LG")
     if province=="BC" || province=="CA"
         
         agent = Agent(false,0,starting_year,1,true,0,false,0,0,nothing,[0,0],[zeros(4),zeros(4)],0,false,false)
@@ -48,23 +56,39 @@ function set_up(max_age=111,province="BC",starting_year=2000,time_horizon=19,n=1
         Not(:proj_scenario)),:year)
 
         incidence = Incidence(Dict_initializer([:β0_μ,:β0_σ]),
-        Dict_initializer([:β0]),nothing,nothing,nothing,nothing,nothing,nothing)
+        Dict_initializer([:β0,:βsex,:βyear,:βage,:βsexyear,:βsexage,:βfam_hist,:βabx_exp,:βcorrection]),
+        Dict_initializer([:β0,:βsex,:βyear,:βage,:βsexyear,:βsexage,:βyearage,:βsexyearage,:βfam_hist,:βabx_exp,:βcorrection]),
+        nothing,nothing,nothing)
         
         @set! incidence.hyperparameters[:β0_μ] = 0;
         @set! incidence.hyperparameters[:β0_σ] = 0.00000001;
-        @set! incidence.incidence_table = groupby(filter([:year,:province] => (x,y) -> x >= min(starting_year,master_incidence_rate.year[nrow(master_incidence_rate)]) && y==province,master_incidence_rate),:year);
-        @set! incidence.prevalence_table = groupby(filter([:year,:province] => (x,y) -> x >= min(starting_year-1,master_prevalence_rate.year[nrow(master_prevalence_rate)]) && y==province,master_prevalence_rate),:year);
-        @set! incidence.parameters[:β0] = 0;
+        @set! incidence.parameters[:β0] = 34.63398846;
+        @set! incidence.parameters[:βsex] = -9.52017810;
+        @set! incidence.parameters[:βyear] = -0.01967344;
+        @set! incidence.parameters[:βage] = [-6.64423331,7.73720625,-5.63121394,3.90920803,-1.39497027];
+        @set! incidence.parameters[:βsexyear] = 0.00461397;
+        @set! incidence.parameters[:βsexage] = [-4.45607619,4.70483885,-2.61760564,0.79555703,0.95476291];
+        @set! incidence.parameters[:βfam_hist] = [log(1.13),0.3619942]
+        @set! incidence.parameters[:βabx_exp] = [1.711+0.115, -0.2920745,0.053];
+        @set! incidence.parameters[:βcorrection] = groupby(select(filter([:type] => (x) -> x == "inc" ,master_occurrence_correction),Not([:type])),[:year,:sex,:age]);
 
-        @set! incidence.calibration_table = groupby(select(filter([:province] => (x) -> x == province ,M3_calibrated_asthma_prev_inc),Not([:province])),[:year,:sex,:fam_history,:abx_exposure]);
-        @set! incidence.min_year = collect(keys(incidence.calibration_table)[1])[1]+1
-        @set! incidence.max_year = collect(keys(incidence.calibration_table)[length(incidence.calibration_table )])[1] 
+        @set! incidence.parameters_prev[:β0] = -2.28093577;
+        @set! incidence.parameters_prev[:βsex] = -0.10755806;
+        @set! incidence.parameters_prev[:βyear] = [2.83586405,-1.18097542];
+        @set! incidence.parameters_prev[:βage] = [1.79932480805632, -2.17989374225804, 3.64152189395539, -2.91796538427475, 1.43423653685647];
+        @set! incidence.parameters_prev[:βsexyear] = [1.29279956487906, 0.036861276364171];
+        @set! incidence.parameters_prev[:βsexage] = [-7.69209530818354, 2.68306716462003, 0.865308192929771, -0.656000992252807, -0.0270826201453694];
+        @set! incidence.parameters_prev[:βyearage] = [50.610032709273, 6.51236955045884, -39.4569160874519, 3.69176099747937, 15.9637932343298, -4.79271775804693, -7.14281869955998, 4.18656498490802, -4.88274672641455, -3.3603262281752];
+        @set! incidence.parameters_prev[:βsexyearage] = [-3.19896302105009, 7.24422362459046, -25.7979736592919, 0.253623898303176, 11.3848773603672, -2.57625491419054, 7.61284030050534, 4.17111534541718, -15.2128066205219, 3.70514542334455];
+        @set! incidence.parameters_prev[:βfam_hist] = [log(1.13),(log(1.13)+log(2.4))/2-log(1.13)];
+        @set! incidence.parameters_prev[:βabx_exp] = [1.711+0.115,-0.225,0.053];
+        @set! incidence.parameters_prev[:βcorrection] = groupby(select(filter([:type] => (x) -> x == "prev" ,master_occurrence_correction),Not([:type])),[:year,:sex,:age]);
+        
+        @set! incidence.min_year = collect(keys(incidence.parameters[:βcorrection])[1])[1]+1
+        @set! incidence.max_year = collect(keys(incidence.parameters[:βcorrection])[length(incidence.parameters[:βcorrection])])[1] - 1
+        @set! incidence.max_age = 63 
         reassessment = Reassessment(nothing)
         @set! reassessment.table =  groupby(filter([:year, :province] => (x, y) -> x >= starting_year && y == province, master_reassessment),:year)
-
-        diagnosis = Diagnosis(nothing,nothing)
-        @set! diagnosis.table =  groupby(filter([:year, :province] => (x, y) -> x >= starting_year && y == province, master_dx),:year)
-        @set! diagnosis.table_mis =  groupby(filter([:year, :province] => (x, y) -> x >= starting_year && y == province, master_mis_dx),:year)
 
         control = Control(Dict_initializer([:β0_μ,:β0_σ]), Dict_initializer( [:β0,:βage,:βsex,:βsexage,:βsexage2,:βage2, :βDx2,:βDx3,:θ]))
         @set! control.hyperparameters[:β0_μ] = 0;
@@ -137,7 +161,6 @@ function set_up(max_age=111,province="BC",starting_year=2000,time_horizon=19,n=1
         death,
         incidence,
         reassessment,
-        diagnosis,
         control,
         exacerbation,
         exacerbation_severity,
