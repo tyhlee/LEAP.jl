@@ -12,40 +12,48 @@ library(roptim)
 # 6) so we can identify a tuner to do this
 
 # asthma prev
-chosen_province <- "BC"
-min_cal_year <- 2000
-baseline_year <- 2000
-if(chosen_province=="CA"){
-max_cal_year <- 2065
 
-} else{
-  max_cal_year <- 2043
-}
+exacerbation_calibrator <- function(chosen_province = "CA",
+                                    baseline_year = 2000,
+                                    max_cal_year = 2065,
+                                    stablization_year = 2025){
+min_cal_year <- baseline_year
+  if(chosen_province=="CA"){
+  max_cal_year <- 2065} else{
+    max_cal_year <- 2043
+  }
 chosen_projection_scenario <- "M3"
 growth_type <- "M3"
 
-prev <- read_csv("master_asthma_prev_interpolated.csv") %>% 
-  filter(province==chosen_province)
+master_prev_inc <- read_csv("master_asthma_prev_inc.csv")
+prev <- master_prev_inc %>%
+  select(year,age,sex,prev)
 
-inc  <- read_csv("master_asthma_prev_interpolated.csv") %>% 
-  filter(province==chosen_province)
+inc  <- master_prev_inc %>%
+  select(year,sex,age,inc)
 
-tmp_prev <- prev%>% filter(year == max(prev$year))
-impute_years <- (max(prev$year)+1):(max_cal_year)
-
-for(i in impute_years){
-  prev <- rbind(prev,
-                tmp_prev %>% 
-                  mutate(year=i))
-}
-
-prev <- prev %>% 
-  select(-province) %>% 
-  pivot_longer(-c(1,2),names_to="sex",values_to="prev") %>% 
-  mutate(sex=as.numeric(sex=="M"))
+# prev <- read_csv("master_asthma_prev_interpolated.csv") %>% 
+#   filter(province==chosen_province)
+# 
+# inc  <- read_csv("master_asthma_prev_interpolated.csv") %>% 
+#   filter(province==chosen_province)
+# 
+# tmp_prev <- prev%>% filter(year == max(prev$year))
+# impute_years <- (max(prev$year)+1):(max_cal_year)
+# 
+# for(i in impute_years){
+#   prev <- rbind(prev,
+#                 tmp_prev %>% 
+#                   mutate(year=i))
+# }
+# 
+# prev <- prev %>% 
+#   select(-province) %>% 
+#   pivot_longer(-c(1,2),names_to="sex",values_to="prev") %>% 
+#   mutate(sex=as.numeric(sex=="M"))
 
 # target population
-df_cihi <- read_rds(paste0("public_dataset/asthma_hosp/",
+df_cihi <- read_rds(paste0("asthma_hosp/",
                            chosen_province,"/tab1.rds"))$rate %>% 
   filter(fiscal_year >= baseline_year) %>% 
   rename(year=fiscal_year) %>% 
@@ -179,13 +187,17 @@ df_target <- pop %>%
          expected_n= p_hosp*expected_exacerbations,
          calibrator_multiplier = true_n/expected_n)
 
-exac_cal <- df_target %>% select(year:age,calibrator_multiplier) %>% mutate(province="BC")
+exac_cal <- df_target %>% 
+  select(year:age,calibrator_multiplier) %>% 
+  mutate(province=chosen_province)
 
-write_csv(exac_cal,"exacerbation_calibration_BC.csv")
+exac_cal
+}
 
-final_result <- rbind(read_csv("exacerbation_calibration_BC.csv"),
-                      read_csv("exacerbation_calibration.csv") %>% 
-                        mutate(province="CA"))
+exacerbation_calibration_BC <- exacerbation_calibrator("BC")
+exacerbation_calibration_CA <- exacerbation_calibrator("CA")
+
+final_result <- rbind(exacerbation_calibration_BC,exacerbation_calibration_CA)
 
 write_csv(final_result,"master_calibrated_exac.csv")
 
