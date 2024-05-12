@@ -6,7 +6,7 @@
 | 4 | calibrate_lifetable_immigration_emigration.R | Projected life table, net immigrants and emigrants, by year, sex, age  | master_life_table.csv,master_emigration_table.csv, master_immigration_table.csv, master_immigration_table_modified.csv |
 | 5 |asthma_occurrence.R | Crude asthma incidence and prevalence equations | asthma_incidence_model.rds, asthma_prevalence_model.rds|
 | 6 | asthma_dx.R | Asthma reassessment by year, sex, age, province | master_asthma_assessment.csv |
-| 7 | asthma_inc_prev_calibration.R, calibration_helper_function.R| Calibrate the effect of risk factors on asthma incidence and prevalence | master_asthma_prev_inc.csv |
+| 7 | asthma_inc_prev_calibration.R, calibration_helper_function.R| Calibrate the effect of risk factors on asthma incidence and prevalence | master_asthma_occurrence_correction.csv |
 | 8 | exacerbation_calibration.R | Calibrate the asthma hospitalization rate | master_calibrated_exac.csv|
 | 9 | asthma_control.pdf | Analysis of asthma control based on the Economic Burden of Asthma data  | asthma control model |
 | 10 | utility.R | Generate the utility values for the general population by sex and age | eq5d_canada.csv |

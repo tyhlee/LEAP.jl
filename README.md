@@ -1,7 +1,3 @@
 # Lifetime Exposures and Asthma outcomes Projection (LEAP)
 
-Documentation for LEAP will be available in Feb 2024.
-
-Here is the pseudo-code of the model:
-
-![Pseudocode](documentation/pseudocode.png)
+Documentation for LEAP can be found here (preprint): [https://www.medrxiv.org/content/10.1101/2024.03.11.24304122v1](https://www.medrxiv.org/content/10.1101/2024.03.11.24304122v1).
