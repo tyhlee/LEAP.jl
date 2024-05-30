@@ -71,7 +71,7 @@ initial_pop_distribution_prop %>%
   mutate(prop=n/n_birth) %>% 
   left_join(initial_pop_distribution_both,by=c("year","age","province"))-> initial_pop_distribution_prop_past
 
-initial_pop <- readRDS("~/Dropbox/Asthma_Julia/src/processed_data/pop_projection_BC_CA.rds") %>% 
+initial_pop <- readRDS(here("public_dataset","pop_projection_BC_CA.rds")) %>% 
   filter(GEO %in% c('Canada',"British Columbia")) %>% 
   filter(REF_DATE >= max(initial_pop_distribution_prop$year)) %>% 
   mutate(Projection_scenario = str_remove(Projection_scenario,"Projection scenario "),
