@@ -59,16 +59,16 @@ prev <- df_asthma %>%
 colnames(prev)[c(3,4)] <- c("F","M")
 prev$province <- chosen_province
 
-misDx <- read_csv("master_asthma_mis_dx.csv")%>% 
-  filter(province==chosen_province)
-misDx$`F` <- 0
-misDx$M <- 0
-Dx <- read_csv("master_asthma_dx.csv") %>% 
-  filter(province==chosen_province)
-Dx$`F` <- 1
-Dx$M <- 1
+# misDx <- read_csv("master_asthma_mis_dx.csv")%>% 
+#   filter(province==chosen_province)
+# misDx$`F` <- 0
+# misDx$M <- 0
+# Dx <- read_csv("master_asthma_dx.csv") %>% 
+#   filter(province==chosen_province)
+# Dx$`F` <- 1
+# Dx$M <- 1
 
-RA <- read_csv("master_asthma_reassessment.csv")%>% 
+RA <- read_csv("../src/processed_data/master_asthma_reassessment.csv")%>% 
   filter(province==chosen_province)
 
 
@@ -197,15 +197,15 @@ tmp_RA <- RA %>%
   pivot_longer(3:4,values_to="ra",names_to='sex')%>% 
   mutate(sex = as.numeric(sex=="M"))
 
-tmp_misDx <- misDx %>% 
-  select(-province)%>% 
-  pivot_longer(3:4,values_to="misDx",names_to='sex')%>% 
-  mutate(sex = as.numeric(sex=="M"))
-
-tmp_Dx <- Dx %>% 
-  select(-province)%>% 
-  pivot_longer(3:4,values_to="Dx",names_to='sex')%>% 
-  mutate(sex = as.numeric(sex=="M"))
+# tmp_misDx <- misDx %>% 
+#   select(-province)%>% 
+#   pivot_longer(3:4,values_to="misDx",names_to='sex')%>% 
+#   mutate(sex = as.numeric(sex=="M"))
+# 
+# tmp_Dx <- Dx %>% 
+#   select(-province)%>% 
+#   pivot_longer(3:4,values_to="Dx",names_to='sex')%>% 
+#   mutate(sex = as.numeric(sex=="M"))
 
 # for each year, sex, age
 # given the effects of risk factors in the incidence equation,
@@ -497,14 +497,12 @@ inc_beta_solver <- function(baseline_year=2001,stabilization_year=2025,max_age=6
   
   res_optim <- optim(unlist(inc_beta_parameters),fn=obj,method='BFGS')
   res_nlm <- nlm(obj,unlist(inc_beta_parameters),steptol=1e-6,gradtol=1e-6,print.level=2)
-  # write_rds(res_optim,"res_optim.rds")
-  # write_rds(res_nlm,"res_nlm.rds")
+  write_rds(res_optim,"res_optim.rds")
 }
 
 
 # incorporate the estimates of the risk factors and correction terms ----------
 res_optim <- read_rds("res_optim.rds") 
-# res_nlm <- read_rds("res_nlm.rds")
 optimized_inc_beta <- res_optim$par
 
 cal_years <- (baseline_year-1):(stabilization_year+1)
@@ -798,7 +796,7 @@ master_correct <- rbind(df_correct_prev,
                         df_correct_inc)
 
 write_csv(master_correct %>% 
-            mutate(correction=ifelse(is.na(correction),0,correction)),"master_asthma_occurrence_correction.csv")
+            mutate(correction=ifelse(is.na(correction),0,correction)),"../src/processed_data/master_asthma_occurrence_correction.csv")
 
 # examine_results <- df_correct %>% 
 #   filter(age !=3)

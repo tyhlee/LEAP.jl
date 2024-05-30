@@ -38,4 +38,4 @@ for(tmp_sex in c(0,1)){
 eq5d_canada <- results %>% 
   arrange(sex,age)
 
-write_csv(eq5d_canada,"eq5d_canada.csv")
+write_csv(eq5d_canada,"../src/processed_data/eq5d_canada.csv")

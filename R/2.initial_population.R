@@ -74,11 +74,15 @@ initial_pop_distribution_prop %>%
 
 initial_pop <- read_csv(here("public_dataset","17100057.csv"))
 colnames(initial_pop) <- gsub(' ','_',colnames(initial_pop))
-initial_pop_distribution <- initial_pop %>%
+pop_projection_BC_CA <- initial_pop %>% 
   select(REF_DATE,GEO,Projection_scenario,Sex,Age_group,VALUE) %>% 
   mutate(Projection_scenario = str_remove(Projection_scenario,"Projection scenario "),
          Projection_scenario = str_remove(Projection_scenario, "\\:.*")) %>% 
-  filter(GEO %in% c('Canada',"British Columbia")) %>%
+  filter(GEO %in% c('Canada',"British Columbia"))
+
+write_rds(pop_projection_BC_CA,"../src/processed_data/pop_projection_BC_CA.rds")
+
+initial_pop_distribution <- pop_projection_BC_CA %>%
   filter(REF_DATE >= max(initial_pop_distribution_prop$year)) %>%
   mutate(Projection_scenario = str_remove(Projection_scenario,"Projection scenario "),
          Projection_scenario = str_remove(Projection_scenario, "\\:.*")) %>%
@@ -164,4 +168,4 @@ master_initial_pop_distribution_prop <- initial_pop_distribution_prop_past %>%
   rbind(.,initial_pop_distribution_prop_project %>% 
   select(year,age,province,n,n_birth,prop,prop_male,projection_scenario))
 
-write_csv(master_initial_pop_distribution_prop,'master_initial_pop_distribution_prop.csv')
+write_csv(master_initial_pop_distribution_prop,'../src/processed_data/master_initial_pop_distribution_prop.csv')

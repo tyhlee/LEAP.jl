@@ -25,7 +25,7 @@ min_cal_year <- baseline_year
 chosen_projection_scenario <- "M3"
 growth_type <- "M3"
 
-master_prev_inc <- read_csv("master_asthma_prev_inc.csv")
+master_prev_inc <- read_csv("../src/processed_data/master_asthma_prev_inc.csv")
 prev <- master_prev_inc %>%
   select(year,age,sex,prev)
 
@@ -53,7 +53,7 @@ inc  <- master_prev_inc %>%
 #   mutate(sex=as.numeric(sex=="M"))
 
 # target population
-df_cihi <- read_rds(paste0("asthma_hosp/",
+df_cihi <- read_rds(paste0("public_dataset/asthma_hosp/",
                            chosen_province,"/tab1.rds"))$rate %>% 
   filter(fiscal_year >= baseline_year) %>% 
   rename(year=fiscal_year) %>% 
@@ -199,5 +199,5 @@ exacerbation_calibration_CA <- exacerbation_calibrator("CA")
 
 final_result <- rbind(exacerbation_calibration_BC,exacerbation_calibration_CA)
 
-write_csv(final_result,"master_calibrated_exac.csv")
+write_csv(final_result,"../src/processsed_data/master_calibrated_exac.csv")
 

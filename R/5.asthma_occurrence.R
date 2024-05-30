@@ -11,7 +11,7 @@ baseline_year <- 2000
 
 
 # admin data --------------------------------------------------------------
-df_admin <- readxl::read_xlsx("asthma_inc_prev.xlsx",sheet=1) %>% 
+df_admin <- readxl::read_xlsx("private_dataset/asthma_inc_prev.xlsx",sheet=1) %>% 
   filter(age_group_desc != "<1 year") %>% 
   mutate(year=substr(fiscal_year,1,4) %>% as.numeric()) %>% 
   rename(sex=gender) %>% 
@@ -28,7 +28,7 @@ df_admin <- df_admin %>%
   mutate(age= ifelse(age==90,100,age))
 
 # BC asthma prev and inc equation -----------------------------------------
-master_BC_asthma <- readxl::read_xlsx("asthma_inc_prev.xlsx",sheet=1) %>% 
+master_BC_asthma <- readxl::read_xlsx("private_dataset/asthma_inc_prev.xlsx",sheet=1) %>% 
   filter(age_group_desc != "<1 year") %>% 
   mutate(year=substr(fiscal_year,1,4) %>% as.numeric()) %>% 
   rename(sex=gender) %>% 

@@ -121,4 +121,4 @@ master_assessment <- master_assessment %>% select(year,age,`F`,M,province)
 
 write_csv(master_assessment %>% 
             mutate(M = ifelse(M>1,1,M),
-                   `F` = ifelse(`F`>1,1,`F`)),"master_asthma_reassessment.csv")
+                   `F` = ifelse(`F`>1,1,`F`)),"../src/processed_data/master_asthma_reassessment.csv")

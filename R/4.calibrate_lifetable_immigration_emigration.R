@@ -21,7 +21,7 @@ for(province_index in 1:length(provinces)){
   
 # life table --------------------------------------------------------------
 
-life_table <- read_csv("life_table.csv") %>% 
+life_table <- read_csv(here("public_dataset","life_table.csv")) %>% 
   filter(province==chosen_province)
 
 death_final_year <- max(life_table$year)
@@ -162,7 +162,7 @@ life_table_list <- rbind(life_table_list,life_table)
 
 # pop growth --------------------------------------------------------------
 
-pop_est <- read_csv("master_initial_pop_distribution_prop.csv") %>% 
+pop_est <- read_csv("../src/processed_data/master_initial_pop_distribution_prop.csv") %>% 
   filter(province==chosen_province) %>%
   filter(year >= baseline_year) %>% 
   mutate(Male = prop_male*n,
