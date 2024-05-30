@@ -1,4 +1,4 @@
-To download a publicly available dataset for *birth.R*, please go to https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710005701, click on the 'Download options', and Download the entire dataset (<350 MB).
+To download a large publicly available dataset for Files 1 and 2 (<350MB), please go to https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710005701, click on the 'Download options', and Download the entire dataset.
 
 | Number | File name | Description | Output |
 |-|:-:|:------:|:---:|
