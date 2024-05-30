@@ -1,3 +1,5 @@
+To download a publicly available dataset for *birth.R*, please go to https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710005701, click on the 'Download options', and Download the entire dataset (<350 MB).
+
 | Number | File name | Description | Output |
 |-|:-:|:------:|:---:|
 | 1 | birth.R | estimated and projected number of births and the proportion of males (vs. females) by year, age, province, and projection scenario | master_birth.csv |
