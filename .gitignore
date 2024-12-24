@@ -26,3 +26,6 @@ docs/site/
 # environment.
 Manifest.toml
 .Rproj.user
+
+# Ignore big fiile
+internal-validation/LEAP_output.jld
