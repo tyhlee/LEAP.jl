@@ -207,7 +207,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Probabilty of dying between ages x and x+1", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.death,'fig_4.png')
+  save_plot(fig.death,'fig_4.jpeg')
   
   
   # Figure 5: Population pyramid -------------------------------------------------------
@@ -296,7 +296,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Number of population", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.pryamid,'fig_5.png')
+  save_plot(fig.pryamid,'fig_5.jpeg')
   
   # Family history ----------------------------------------------------------
   rate_fam_history <-  sum(extract_df("family_history","both"))/sum(results[[1]])
@@ -355,7 +355,7 @@ internal_validator <- function(results,baseline_year=2001,
     fig_setting +
     theme(legend.title = element_blank())-> fig.ABE
   
-  save_plot(fig.ABE,'fig_6.png')
+  save_plot(fig.ABE,'fig_6.jpeg')
   
   # Figure 7: Asthma prevalence -------------------------------------------------------
   
@@ -473,7 +473,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Asthma prevalence (per 1,000)", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=20)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 20)))
-  save_plot(fig.asthma.prev,'fig_7.png')
+  save_plot(fig.asthma.prev,'fig_7.jpeg')
   
   # Asthma prevalence OR ---------------------------------------------------------------
   options(dplyr.summarise.inform = FALSE)
@@ -641,7 +641,7 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.position = 'none')-> fig.control
   
-  save_plot(fig.control,'fig_8.png')
+  save_plot(fig.control,'fig_8.jpeg')
 
   # Figure 9: Exacerbation -------------------------------------------------
   df_exac <- data.frame(Year=1:max_year,
@@ -691,7 +691,7 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.title=element_blank())-> fig.exac_sev
   
-  save_plot(fig.exac_sev,'fig_9.png')
+  save_plot(fig.exac_sev,'fig_9.jpeg')
   
   
   # Figure 10: Hospitalization -------------------------------------------
@@ -826,7 +826,7 @@ internal_validator <- function(results,baseline_year=2001,
     scale_x_continuous(breaks=fig_years)+
     xlab("Year") -> fig.asthma.hosp
   
-  save_plot(fig.asthma.hosp,'fig_10.png')
+  save_plot(fig.asthma.hosp,'fig_10.jpeg')
   
   return(list(fig.death,
               fig.pryamid,
