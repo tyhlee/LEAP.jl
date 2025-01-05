@@ -296,7 +296,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Number of population", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.pryamid,'fig_6.png')
+  save_plot(fig.pryamid,'fig_5.png')
   
   # Family history ----------------------------------------------------------
   rate_fam_history <-  sum(extract_df("family_history","both"))/sum(results[[1]])
@@ -638,7 +638,7 @@ internal_validator <- function(results,baseline_year=2001,
     xlab('Year') +
     scale_x_continuous(breaks=fig_years)+
     fig_setting +
-    theme(text=element_text(size=25))+
+    theme(text=element_text(size=20))+
     theme(legend.position = 'none')-> fig.control
   
   save_plot(fig.control,'fig_8.png')
