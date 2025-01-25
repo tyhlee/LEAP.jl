@@ -149,7 +149,7 @@ internal_validator <- function(results,baseline_year=2001,
   # 
   # true_prop <- birth_estimate$N/birth_estimate$N[1]
 
-  # Figure 4: death -------------------------------------------------------------------
+  # Figure 3: death -------------------------------------------------------------------
   # Number of population generated ------------------------------------------
   n_generated <- cbind(Female=extract_df('alive','female',age=1)+extract_df('death','female',age=1)+extract_df("emigration","female",age=1),
                        Male=extract_df('alive','male',age=1)+extract_df('death','male',age=1)+extract_df("emigration","male",age=1)) %>%
@@ -207,10 +207,10 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Probabilty of dying between ages x and x+1", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.death,'fig_4.jpeg')
+  save_plot(fig.death,'fig_3.jpeg')
   
   
-  # Figure 5: Population pyramid -------------------------------------------------------
+  # Figure 4: Population pyramid -------------------------------------------------------
   n_alive_female <- extract_df('alive','female',age='all') +
     extract_df('death','female',age='all') + extract_df("emigration","female",age='all')
   n_alive_male <- extract_df('alive','male',age='all')   +
@@ -296,7 +296,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Number of population", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.pryamid,'fig_5.jpeg')
+  save_plot(fig.pryamid,'fig_4.jpeg')
   
   # Family history ----------------------------------------------------------
   rate_fam_history <-  sum(extract_df("family_history","both"))/sum(results[[1]])
@@ -313,7 +313,7 @@ internal_validator <- function(results,baseline_year=2001,
   
   print(fam_result)
   
-  # Figure 6: Antibiotic exposure ------------------------------------------------------
+  # Figure 5: Antibiotic exposure ------------------------------------------------------
   # count_model <- read_rds("data-raw/count_model_BC.rds")
   # count_data <- read_rds("data-raw/Abx_count_data_BC.rds") %>%
   #   mutate(rate=N_Abx/N*1000) %>%
@@ -355,9 +355,9 @@ internal_validator <- function(results,baseline_year=2001,
     fig_setting +
     theme(legend.title = element_blank())-> fig.ABE
   
-  save_plot(fig.ABE,'fig_6.jpeg')
+  save_plot(fig.ABE,'fig_5.jpeg')
   
-  # Figure 7: Asthma prevalence -------------------------------------------------------
+  # Figure 6: Asthma prevalence -------------------------------------------------------
   
   simulation_max_year <- baseline_year+max_year-1
   
@@ -473,7 +473,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Asthma prevalence (per 1,000)", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=20)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 20)))
-  save_plot(fig.asthma.prev,'fig_7.jpeg')
+  save_plot(fig.asthma.prev,'fig_6.jpeg')
   
   # Asthma prevalence OR ---------------------------------------------------------------
   options(dplyr.summarise.inform = FALSE)
@@ -602,7 +602,7 @@ internal_validator <- function(results,baseline_year=2001,
     filter(ratio_OR < -0.40 | ratio_OR > 0.70) %>% 
     View()
   
-  # Figure 8: Control -----------------------------------------------------------------
+  # Figure 7: Control -----------------------------------------------------------------
   n_control <- extract_df("control",'both') %>% 
     lapply(.,function(x){
       rowSums(x)
@@ -641,9 +641,9 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.position = 'none')-> fig.control
   
-  save_plot(fig.control,'fig_8.jpeg')
+  save_plot(fig.control,'fig_7.jpeg')
 
-  # Figure 9: Exacerbation -------------------------------------------------
+  # Figure 8: Exacerbation -------------------------------------------------
   df_exac <- data.frame(Year=1:max_year,
                         n=rowSums(extract_df(type = 'exacerbation',sex='both',age='all')),
                         N = rowSums(extract_df(type = 'asthma_prevalence',sex='both',age='all'))) %>%
@@ -691,10 +691,10 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.title=element_blank())-> fig.exac_sev
   
-  save_plot(fig.exac_sev,'fig_9.jpeg')
+  save_plot(fig.exac_sev,'fig_8.jpeg')
   
   
-  # Figure 10: Hospitalization -------------------------------------------
+  # Figure 9: Hospitalization -------------------------------------------
   df_cihi <- read_rds(paste0("R/public_dataset/asthma_hosp/",
                              chosen_province,"/tab1.rds"))$rate %>% 
     filter(fiscal_year >= min(2001,baseline_year)) %>% 
@@ -826,7 +826,7 @@ internal_validator <- function(results,baseline_year=2001,
     scale_x_continuous(breaks=fig_years)+
     xlab("Year") -> fig.asthma.hosp
   
-  save_plot(fig.asthma.hosp,'fig_10.jpeg')
+  save_plot(fig.asthma.hosp,'fig_9.jpeg')
   
   return(list(fig.death,
               fig.pryamid,
