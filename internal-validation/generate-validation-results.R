@@ -10,7 +10,7 @@ select <- dplyr::select
 # Set up Julia
 # Install Julia if necessary: https://julialang.org/downloads/
 # Set the path to Julia executable accordingly
-julia_path <- "/opt/homebrew/Cellar/julia/1.11.1/bin"
+julia_path <- "/Applications/Julia-1.11.app/Contents/Resources/julia/bin"
 # Initiate a Julia terminal
 julia <- JuliaCall::julia_setup(JULIA_HOME = julia_path)
 # Import required packages for Julia
@@ -20,13 +20,6 @@ julia_command("using JLD")
 # Figure settings
 fig_setting <- fig_theme <- theme_classic() +
   theme(legend.position = 'top')
-# baseline_year = 2001
-# chosen_province="CA"
-# growth_type = "M3"
-# pop_years = c(2001,2010,2015,2020,2025,2030)
-# fig_years = c(2001,seq(2005,2030,by=5))
-# plot_dims = c(2,3)
-# save_fig=T
 
 # Function for generating internal validation results and figures
 internal_validator <- function(results,baseline_year=2001,
@@ -137,7 +130,6 @@ internal_validator <- function(results,baseline_year=2001,
   emi <- rowSums(extract_df(type = 'emigration',sex='both',age='all'))
   
 
-  # 
   # # assumed
   # birth_estimate <- read_csv("src/processed_data/master_birth_estimate.csv") %>% 
   #   filter(year>= baseline_year & year <= baseline_year+nrow(n_generated)-1) %>% 
@@ -149,7 +141,7 @@ internal_validator <- function(results,baseline_year=2001,
   # 
   # true_prop <- birth_estimate$N/birth_estimate$N[1]
 
-  # Figure 3: death -------------------------------------------------------------------
+  # Supp Figure 6: death -------------------------------------------------------------------
   # Number of population generated ------------------------------------------
   n_generated <- cbind(Female=extract_df('alive','female',age=1)+extract_df('death','female',age=1)+extract_df("emigration","female",age=1),
                        Male=extract_df('alive','male',age=1)+extract_df('death','male',age=1)+extract_df("emigration","male",age=1)) %>%
@@ -207,10 +199,10 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Probabilty of dying between ages x and x+1", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.death,'fig_3.jpeg')
+  save_plot(fig.death,'SM_fig_6.jpeg')
   
   
-  # Figure 4: Population pyramid -------------------------------------------------------
+  # Figure 2: Population pyramid -------------------------------------------------------
   n_alive_female <- extract_df('alive','female',age='all') +
     extract_df('death','female',age='all') + extract_df("emigration","female",age='all')
   n_alive_male <- extract_df('alive','male',age='all')   +
@@ -296,7 +288,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Number of population", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=15)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 15)))
-  save_plot(fig.pryamid,'fig_4.jpeg')
+  save_plot(fig.pryamid,'fig_2.jpeg')
   
   # Family history ----------------------------------------------------------
   rate_fam_history <-  sum(extract_df("family_history","both"))/sum(results[[1]])
@@ -313,7 +305,7 @@ internal_validator <- function(results,baseline_year=2001,
   
   print(fam_result)
   
-  # Figure 5: Antibiotic exposure ------------------------------------------------------
+  # Figure 3: Antibiotic exposure ------------------------------------------------------
   # count_model <- read_rds("data-raw/count_model_BC.rds")
   # count_data <- read_rds("data-raw/Abx_count_data_BC.rds") %>%
   #   mutate(rate=N_Abx/N*1000) %>%
@@ -355,9 +347,9 @@ internal_validator <- function(results,baseline_year=2001,
     fig_setting +
     theme(legend.title = element_blank())-> fig.ABE
   
-  save_plot(fig.ABE,'fig_5.jpeg')
+  save_plot(fig.ABE,'fig_3.jpeg')
   
-  # Figure 6: Asthma prevalence -------------------------------------------------------
+  # Figure 4: Asthma prevalence -------------------------------------------------------
   
   simulation_max_year <- baseline_year+max_year-1
   
@@ -473,7 +465,7 @@ internal_validator <- function(results,baseline_year=2001,
     annotate_figure(left = textGrob("Asthma prevalence (per 1,000)", rot = 90, vjust = 1,
                                     gp=gpar(fontsize=20)),
                     bottom = textGrob("Age (year)", gp = gpar(fontsize = 20)))
-  save_plot(fig.asthma.prev,'fig_6.jpeg')
+  save_plot(fig.asthma.prev,'fig_4.jpeg')
   
   # Asthma prevalence OR ---------------------------------------------------------------
   options(dplyr.summarise.inform = FALSE)
@@ -598,11 +590,11 @@ internal_validator <- function(results,baseline_year=2001,
   
   quantile(prev_OR$ratio_OR,c(0.01,0.99))
   
-  prev_OR %>% 
-    filter(ratio_OR < -0.40 | ratio_OR > 0.70) %>% 
-    View()
+  # prev_OR %>% 
+  #   filter(ratio_OR < -0.40 | ratio_OR > 0.70) %>% 
+  #   View()
   
-  # Figure 7: Control -----------------------------------------------------------------
+  # Supp Figure 7: Control -----------------------------------------------------------------
   n_control <- extract_df("control",'both') %>% 
     lapply(.,function(x){
       rowSums(x)
@@ -641,9 +633,9 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.position = 'none')-> fig.control
   
-  save_plot(fig.control,'fig_7.jpeg')
+  save_plot(fig.control,'SM_fig_7.jpeg')
 
-  # Figure 8: Exacerbation -------------------------------------------------
+  # Supp Figure 8: Exacerbation -------------------------------------------------
   df_exac <- data.frame(Year=1:max_year,
                         n=rowSums(extract_df(type = 'exacerbation',sex='both',age='all')),
                         N = rowSums(extract_df(type = 'asthma_prevalence',sex='both',age='all'))) %>%
@@ -691,10 +683,10 @@ internal_validator <- function(results,baseline_year=2001,
     theme(text=element_text(size=20))+
     theme(legend.title=element_blank())-> fig.exac_sev
   
-  save_plot(fig.exac_sev,'fig_8.jpeg')
+  save_plot(fig.exac_sev,'SM_fig_8.jpeg')
   
   
-  # Figure 9: Hospitalization -------------------------------------------
+  # Supp Figure 9: Hospitalization -------------------------------------------
   df_cihi <- read_rds(paste0("R/public_dataset/asthma_hosp/",
                              chosen_province,"/tab1.rds"))$rate %>% 
     filter(fiscal_year >= min(2001,baseline_year)) %>% 
@@ -826,7 +818,122 @@ internal_validator <- function(results,baseline_year=2001,
     scale_x_continuous(breaks=fig_years)+
     xlab("Year") -> fig.asthma.hosp
   
-  save_plot(fig.asthma.hosp,'fig_9.jpeg')
+  save_plot(fig.asthma.hosp,'SM_fig_9.jpeg')
+  
+
+# Figure 5: utility ------------------------------------------------------
+
+  utility_data <- read_csv("src/processed_data/eq5d_canada.csv")
+  # by age and sex
+  n_male_age <- extract_df("alive","male",age=0:max_age) + 
+    extract_df("death","male",age=0:max_age)  +
+    extract_df("emigration","male",age=0:max_age)
+  
+  df_util_male_sum <- matrix(sapply(results$outcome_matrix$util[1:max_year,1:max_age,2],
+                             identity),
+                    nrow=max_year,
+                    ncol=max_age) 
+  
+  df_util_male <- data.frame(age = 0:(max_age-1),
+                             eq5d_estimate = colMeans(df_util_male_sum) / colMeans(n_male_age),
+                             sex = 1)
+  n_female_age <- extract_df("alive","female",age=0:max_age) + 
+    extract_df("death","female",age=0:max_age) +
+    extract_df("emigration","female",age=0:max_age)
+  
+  df_util_female_sum <- colMeans(matrix(sapply(results$outcome_matrix$util[1:max_year,1:max_age,1],
+                                         identity),
+                                  nrow=max_year,
+                                  ncol=max_age)) %>% 
+    as.vector()
+  
+  df_util_female <- data.frame(age=0:(max_age-1),
+                               eq5d_estimate = df_util_female_sum / colMeans(n_female_age),
+                          sex=0)
+  
+  df_util <- rbind(df_util_male,df_util_female) %>% 
+    left_join(utility_data %>% select(-se),
+              by=c("age","sex")) %>% 
+    filter(age<=90) %>% 
+    mutate(diff = eq5d - eq5d_estimate)
+  
+  df_util_plot <- df_util %>% 
+    pivot_longer(cols=c(2,4),values_to="eq5d") %>% 
+    mutate(sex = ifelse(sex==0,"Female","Male"))
+  sqrt(mean(df_util_plot$diff^2))
+  ggplot(data=df_util_plot,aes(x=age,y=eq5d,col=name,linetype=name)) +
+    geom_line(linewidth=2,alpha=0.9) +
+    # geom_point()+
+    facet_grid(.~sex) +
+    xlim(0,100) +
+    theme(legend.position='none') +
+    scale_color_manual(values=c("eq5d_estimate"="grey",
+                                "eq5d"="black"),c("Estimated","Observed")) +
+    scale_linetype_manual(values=c("eq5d_estimate"="solid",
+                                "eq5d"="dashed"),c("Estimated","Observed")) +
+    ylab("Utility (EQ-5D-5L)") +
+    fig_setting +
+    theme(text=element_text(size=20),
+          legend.position='none')+
+    xlab("Age (year)") +
+    ylim(c(0,1)) -> fig.util
+  
+  save_plot(fig.util,'fig_5.jpeg')
+  
+
+# Supp Figure 10: Cost --------------------------------------------------------------------
+  
+  df_exac_cost <- df_severity %>% 
+    # 215.8, 986.04, 4025.5, 16434.0
+    mutate(total_cost = n1 * 215.8 + n2*986.04 + n3*4025.5 + n4*16434)
+  
+  df_control_cost <- df_control %>% 
+    #3937.52, 4921.9, 5190.82
+    mutate(total_cost = n1 *3937.52 + n2 * 4921.9 + n3*5190.82)
+  
+  num_asthma_cases <- asthma_prev %>% 
+    filter(Type=='observed') %>% 
+    group_by(year) %>% 
+    summarise(n=sum(n))
+  
+  df_year_cost <- data.frame(year = baseline_year:(baseline_year+max_year-1),
+                             num_asthma = num_asthma_cases$n,
+                             exac_cost = df_exac_cost$total_cost,
+                             control_cost = df_control_cost$total_cost) %>% 
+    mutate( total_cost = exac_cost+control_cost,
+            exac_cost_per_patient = exac_cost / num_asthma,
+            control_cost_per_patient = control_cost/ num_asthma,
+            cost_per_patient = total_cost/num_asthma) 
+  
+  ggplot(data=df_year_cost %>% 
+           select(year,exac_cost,control_cost) %>% 
+           mutate(exac_cost = exac_cost/1000000,
+                  control_cost = control_cost / 1000000),
+         aes(x=year)) +
+    geom_line(aes(y=control_cost),color='black',linewidth=3,linetype='solid') +
+    geom_line(aes(y=exac_cost*10),color="black",linewidth=3,linetype='dashed')+
+    scale_y_continuous(name = paste("Total direct costs due to", "\n", "asthma control (millions)"),
+                       sec.axis = sec_axis(~./10, name=paste("Total direct costs due to", "\n", "asthma exacerbation (millions)"))) +
+    fig_setting +
+    xlab("Year") + 
+    scale_x_continuous(breaks=fig_years) +
+    theme(text=element_text(size=20)) -> fig.cost1
+  
+  ggplot(data=df_year_cost %>% 
+           select(year,exac_cost_per_patient,control_cost_per_patient),
+         aes(x=year)) +
+    geom_line(aes(y=control_cost_per_patient),color='black',linewidth=3,linetype='solid') +
+    geom_line(aes(y=exac_cost_per_patient*10),color="black",linewidth=3,linetype='dashed')+
+    scale_y_continuous(name = paste("Per-patient direct costs due to", "\n", "asthma control per patient"),
+                       sec.axis = sec_axis(~./10, name=paste("Per-patient direct costs due to", "\n", "asthma exacerbation"))) +
+    fig_setting +
+    xlab("Year") +
+    scale_x_continuous(breaks=fig_years) +
+    theme(text=element_text(size=20)) -> fig.cost2 
+  
+  fig.cost <- grid.arrange(fig.cost1,fig.cost2,ncol=1)
+  
+  save_plot(fig.cost,'SM_fig_10.jpeg')
   
   return(list(fig.death,
               fig.pryamid,
@@ -837,7 +944,9 @@ internal_validator <- function(results,baseline_year=2001,
               fig.control,
               fig.exac_sev,
               fig.asthma.hosp,
-              hosp_summary))
+              hosp_summary,
+              fig.util,
+              fig.cost))
 }
 
 # Load simulation results
@@ -849,6 +958,7 @@ IV_results <- internal_validator(results)
 prev_OR <- IV_results[[6]]
 summary(prev_OR$ratio_OR)
 quantile(prev_OR$ratio_OR,c(0.01,0.99))
+
 # Look at extreme cases:
 prev_OR %>% 
   filter(ratio_OR < -0.40 | ratio_OR > 0.70) %>% 
